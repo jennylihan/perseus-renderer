@@ -173,3 +173,66 @@ legend {
 .btn-primary:hover {
     background: #1a5cd8;
 }
+
+/* Item sidebar: fixed on wide screens, hidden where it would crowd the grid. */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 230px;
+    overflow-y: auto;
+    background: #fff;
+    border-right: 1px solid #e3e5e8;
+    padding: 16px 14px;
+    font-size: 13px;
+    z-index: 10;
+}
+
+.sidebar h3 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9a9da3;
+}
+
+.sidebar a {
+    display: block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: #5c6066;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar a:hover {
+    background: #f0f1f3;
+    color: #1865f2;
+}
+
+.sidebar a.active {
+    background: #e8f0fe;
+    color: #1865f2;
+    font-weight: 600;
+}
+
+.sidebar-label {
+    color: #9a9da3;
+    font-weight: 400;
+}
+
+@media (min-width: 1100px) {
+    .app {
+        margin-left: 230px;
+        max-width: none;
+    }
+}
+
+@media (max-width: 1099px) {
+    .sidebar {
+        display: none;
+    }
+}
