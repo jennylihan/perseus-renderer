@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export type SidebarEntry = {label?: string};
+export type SidebarEntry = {label?: string; group?: string};
 
 type Props = {
     entries: SidebarEntry[];
@@ -39,28 +39,45 @@ export function Sidebar({entries, getCard}: Props): React.ReactElement | null {
         return null;
     }
 
+    const hasGroups = entries.some((e) => e.group);
+
     return (
         <nav className="sidebar" aria-label="Items">
             <h3>Items</h3>
             {entries.map((entry, i) => (
-                <a
-                    key={i}
-                    href={`#item-${i + 1}`}
-                    className={i === active ? "active" : undefined}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        getCard(i)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                        });
-                        setActive(i);
-                    }}
-                >
-                    Item {i + 1}
-                    {entry.label && (
-                        <span className="sidebar-label"> · {entry.label}</span>
+                <React.Fragment key={i}>
+                    {hasGroups && entry.group !== entries[i - 1]?.group && (
+                        <h4
+                            style={{
+                                margin: "14px 0 4px",
+                                fontSize: 12,
+                                color: "#21242c",
+                            }}
+                        >
+                            {entry.group ?? "Ungrouped"}
+                        </h4>
                     )}
-                </a>
+                    <a
+                        href={`#item-${i + 1}`}
+                        className={i === active ? "active" : undefined}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            getCard(i)?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            });
+                            setActive(i);
+                        }}
+                    >
+                        Item {i + 1}
+                        {entry.label && (
+                            <span className="sidebar-label">
+                                {" "}
+                                · {entry.label}
+                            </span>
+                        )}
+                    </a>
+                </React.Fragment>
             ))}
         </nav>
     );

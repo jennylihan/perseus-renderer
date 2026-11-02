@@ -62,6 +62,7 @@ export function PerseusItemRenderer({item, renderKey}: Props): React.ReactElemen
     };
 
     const summary = score ? scoreText(score) : null;
+    const answerShown = showSolutions === "all";
 
     return (
         <PerseusI18nContextProvider strings={mockStrings} locale="en">
@@ -99,6 +100,18 @@ export function PerseusItemRenderer({item, renderKey}: Props): React.ReactElemen
                                 onClick={handleReset}
                             >
                                 Reset
+                            </button>
+                            <button
+                                type="button"
+                                className="btn"
+                                onClick={() => {
+                                    setScore(null);
+                                    setShowSolutions(
+                                        answerShown ? "none" : "all",
+                                    );
+                                }}
+                            >
+                                {answerShown ? "Hide answer" : "Show answer"}
                             </button>
                             {summary && (
                                 <span
