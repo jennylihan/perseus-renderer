@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import {PerseusItemRenderer} from "./PerseusItemRenderer";
+import {Sidebar} from "./Sidebar";
 
 import type {PerseusItem} from "@khanacademy/perseus-core";
 
@@ -60,6 +61,11 @@ export function App(): React.ReactElement {
     // Bumped on every load so each renderer resets its transient state.
     const [loadKey, setLoadKey] = React.useState(0);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const cardRefs = React.useRef<(HTMLElement | null)[]>([]);
+    const getCard = React.useCallback(
+        (i: number) => cardRefs.current[i] ?? null,
+        [],
+    );
 
     const loadJson = React.useCallback((raw: string, name: string) => {
         try {
@@ -106,68 +112,78 @@ export function App(): React.ReactElement {
     }, [loadSample]);
 
     return (
-        <div className="app">
-            <header className="app-header">
-                <h1>Perseus Renderer</h1>
-                <p>
-                    Load a <code>.json</code> file containing a Perseus item or
-                    an array of items, and interact with them below.
-                </p>
-            </header>
-
-            <div className="toolbar">
-                <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    Choose .json file…
-                </button>
-                <button type="button" className="btn" onClick={loadSample}>
-                    Load sample
-                </button>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".json,application/json"
-                    onChange={handleFile}
-                    style={{display: "none"}}
-                />
-                {fileName && (
-                    <span className="file-name">
-                        {fileName} — {items.length}{" "}
-                        {items.length === 1 ? "item" : "items"}
-                    </span>
+        <>
+            <Sidebar entries={items} getCard={getCard} />
+            <div className="app">
+                <header className="app-header">
+                    <h1>Perseus Renderer</h1>
+                    <p>
+                        Load a <code>.json</code> file containing a Perseus item or
+                        an array of items, and interact with them below.
+                    </p>
+                </header>
+    
+                <div className="toolbar">
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        Choose .json file…
+                    </button>
+                    <button type="button" className="btn" onClick={loadSample}>
+                        Load sample
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json,application/json"
+                        onChange={handleFile}
+                        style={{display: "none"}}
+                    />
+                    {fileName && (
+                        <span className="file-name">
+                            {fileName} — {items.length}{" "}
+                            {items.length === 1 ? "item" : "items"}
+                        </span>
+                    )}
+                </div>
+    
+                {error && <div className="error">{error}</div>}
+    
+                {items.length === 0 && !error ? (
+                    <p className="empty">Nothing loaded yet.</p>
+                ) : (
+                    <div className="item-grid">
+                        {items.map(({item, label}, i) => (
+                            <section
+                                className="item-card"
+                                id={`item-${i + 1}`}
+                                key={`${loadKey}-${i}`}
+                                ref={(el) => {
+                                    cardRefs.current[i] = el;
+                                }}
+                            >
+                                <div className="item-card-header">
+                                    Item {i + 1}
+                                    {label && (
+                                        <span className="item-card-label">
+                                            {" "}
+                                            · {label}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="item-card-body">
+                                    <PerseusItemRenderer
+                                        item={item}
+                                        renderKey={loadKey}
+                                    />
+                                </div>
+                            </section>
+                        ))}
+                    </div>
                 )}
             </div>
-
-            {error && <div className="error">{error}</div>}
-
-            {items.length === 0 && !error ? (
-                <p className="empty">Nothing loaded yet.</p>
-            ) : (
-                <div className="item-grid">
-                    {items.map(({item, label}, i) => (
-                        <section className="item-card" key={`${loadKey}-${i}`}>
-                            <div className="item-card-header">
-                                Item {i + 1}
-                                {label && (
-                                    <span className="item-card-label">
-                                        {" "}
-                                        · {label}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="item-card-body">
-                                <PerseusItemRenderer
-                                    item={item}
-                                    renderKey={loadKey}
-                                />
-                            </div>
-                        </section>
-                    ))}
-                </div>
-            )}
-        </div>
+        </>
     );
 }
