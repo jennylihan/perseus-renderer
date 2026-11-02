@@ -35,6 +35,10 @@ export function PerseusItemRenderer({
     }, [renderKey, showAnswer]);
 
     const showSolutions = answerShown ? "all" : "none";
+    // Showing the answer also reveals every hint (Perseus labels them
+    // "Hint N") and puts widgets in review mode, which is where radio
+    // choices display their per-choice rationales.
+    const hintsVisible = answerShown ? (item.hints?.length ?? 0) : 0;
 
     return (
         <PerseusI18nContextProvider strings={mockStrings} locale="en">
@@ -54,6 +58,8 @@ export function PerseusItemRenderer({
                                 }}
                                 keypadElement={keypadElement}
                                 showSolutions={showSolutions}
+                                reviewMode={answerShown}
+                                hintsVisible={hintsVisible}
                             />
                         </div>
 
