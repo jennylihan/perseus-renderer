@@ -44,8 +44,18 @@ single object or an array of objects, and each object can be either shape:
 
 You can also click **Paste JSON…** and paste any of those shapes directly
 (⌘/Ctrl+Enter renders). **Copy all JSON** and each card's **Copy JSON** copy the
-item JSON back out exactly as it was loaded. Each card has **Check answer** /
-**Reset** scoring and a **Show answer** toggle that reveals the solution.
+item JSON back out exactly as it was loaded.
+
+Every card shows the correct answer by default, with a **Hide answer** /
+**Show answer** toggle. To change the default from the JSON itself:
+
+- Put `"showAnswers": false` at the top level of the file to hide answers
+  for every item. For a bare array, wrap it: `{ "showAnswers": false, "items": [...] }`.
+- Put `"showAnswer": true` or `false` on an individual item to override the
+  file-wide setting for just that card.
+
+Both fields are stripped before the item reaches Perseus and before it is
+copied back out.
 
 Every item in the file is rendered as its own interactive card in a two-column
 grid. Click **Load sample** (or just open the app) to load
@@ -60,7 +70,7 @@ The interesting bits, and why each is needed:
 | [`src/main.tsx`](src/main.tsx) | Loads CSS (Perseus + Wonder Blocks tokens + MathJax), calls `init()` to register widgets, sets global `Dependencies`, and wraps the app in `<RenderStateRoot>`. |
 | [`src/perseus-deps.tsx`](src/perseus-deps.tsx) | The `PerseusDependencies` (V1 + V2) objects Perseus requires, modeled on Perseus's own test harness but with a real MathJax `TeX` component. |
 | [`src/tex.tsx`](src/tex.tsx) | Real math rendering via `@khanacademy/mathjax-renderer`. |
-| [`src/PerseusItemRenderer.tsx`](src/PerseusItemRenderer.tsx) | Wraps `<ServerItemRenderer>` with the i18n context, the keypad context (for math-input widgets), and a Check/Reset UI that scores via `scorePerseusItem`. |
+| [`src/PerseusItemRenderer.tsx`](src/PerseusItemRenderer.tsx) | Wraps `<ServerItemRenderer>` with the i18n context, the keypad context (for math-input widgets), and the Show/Hide answer toggle driven by `showSolutions`. |
 | [`src/App.tsx`](src/App.tsx) | The file picker + two-column grid of item cards. Reads the chosen `.json` file, normalizes a single item or an array into a list, and renders one `PerseusItemRenderer` per item. |
 
 ### Gotchas worth knowing (these took the most digging)

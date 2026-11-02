@@ -10,12 +10,43 @@ import type {PerseusItem} from "@khanacademy/perseus-core";
 // sidebar.
 // `raw` is the item JSON exactly as loaded, before normalize() adds
 // defaults, so the copy buttons round-trip to the source.
+// `showAnswer` is whether the card reveals the correct answer on load.
 type LabeledItem = {
     item: PerseusItem;
     raw: any;
     label?: string;
     group?: string;
+    showAnswer: boolean;
 };
+
+// Answers are shown by default. A top-level `"showAnswers": false` on the
+// loaded JSON hides them for every item, and a per-item `"showAnswer"` field
+// overrides that for just that item. Both are stripped before rendering.
+function resolveShowAnswer(raw: any, fileDefault: boolean): boolean {
+    return typeof raw?.showAnswer === "boolean" ? raw.showAnswer : fileDefault;
+}
+
+function stripShowAnswer(raw: any): any {
+    if (raw && typeof raw === "object" && "showAnswer" in raw) {
+        const {showAnswer: _ignored, ...rest} = raw;
+        return rest;
+    }
+    return raw;
+}
+
+function labeled(
+    raw: any,
+    fileDefault: boolean,
+    extra: {label?: string; group?: string} = {},
+): LabeledItem {
+    const data = stripShowAnswer(raw);
+    return {
+        item: normalize(data),
+        raw: data,
+        showAnswer: resolveShowAnswer(raw, fileDefault),
+        ...extra,
+    };
+}
 
 // Accepts either a full PerseusItem ({question, hints, answerArea}) or a bare
 // PerseusRenderer ({content, widgets, images}) and normalizes to a PerseusItem.
@@ -59,7 +90,7 @@ function isAssessmentItemsExport(entry: any): boolean {
 // Flatten one exercise entry into labeled items, one per assessment item,
 // grouped under the exercise's problem type. `itemData` may be a JSON string
 // or an already-parsed object.
-function flattenExercise(entry: any): LabeledItem[] {
+function flattenExercise(entry: any, fileDefault: boolean): LabeledItem[] {
     const group =
         typeof entry.problemType === "string" ? entry.problemType : undefined;
     return entry.assessmentItems
@@ -69,28 +100,32 @@ function flattenExercise(entry: any): LabeledItem[] {
                 typeof ai.itemData === "string"
                     ? JSON.parse(ai.itemData)
                     : ai.itemData;
-            return {item: normalize(data), raw: data, group};
+            return labeled(data, fileDefault, {group});
         });
 }
 
 // A file may contain: a full KA exercise export, a list of exercises with
-// `assessmentItems`, a single item, or an array of items. Normalize any of
-// those into a list of labeled items.
+// `assessmentItems`, a single item, or an array of items. Any of those may
+// also be wrapped as `{showAnswers, items: [...]}` to set the file-wide
+// answer default. Normalize all of it into a list of labeled items.
 function toItems(parsed: any): LabeledItem[] {
+    const fileDefault = parsed?.showAnswers !== false;
     if (isExerciseExport(parsed)) {
         return parsed.items
             .filter((it: any) => it && it.item_data)
-            .map((it: any) => ({
-                item: normalize(it.item_data),
-                raw: it.item_data,
-                label: it.name,
-            }));
+            .map((it: any) =>
+                labeled(it.item_data, fileDefault, {label: it.name}),
+            );
     }
-    const list = Array.isArray(parsed) ? parsed : [parsed];
+    const body =
+        parsed && !Array.isArray(parsed) && Array.isArray(parsed.items)
+            ? parsed.items
+            : parsed;
+    const list = Array.isArray(body) ? body : [body];
     return list.flatMap((p) =>
         isAssessmentItemsExport(p)
-            ? flattenExercise(p)
-            : [{item: normalize(p), raw: p}],
+            ? flattenExercise(p, fileDefault)
+            : [labeled(p, fileDefault)],
     );
 }
 
@@ -321,7 +356,7 @@ export function App(): React.ReactElement {
                     <p className="empty">Nothing loaded yet.</p>
                 ) : (
                     <div className="item-grid">
-                        {items.map(({item, raw, label, group}, i) => (
+                        {items.map(({item, raw, label, group, showAnswer}, i) => (
                             <section
                                 className="item-card"
                                 id={`item-${i + 1}`}
@@ -364,6 +399,7 @@ export function App(): React.ReactElement {
                                 <div className="item-card-body">
                                     <PerseusItemRenderer
                                         item={item}
+                                        showAnswer={showAnswer}
                                         renderKey={loadKey}
                                     />
                                 </div>
