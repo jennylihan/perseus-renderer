@@ -41,8 +41,7 @@ legend {
 }
 
 .app {
-    max-width: 1400px;
-    margin: 0 auto;
+    margin-left: 230px;
     padding: 16px 24px 48px;
 }
 
@@ -71,16 +70,15 @@ legend {
 }
 
 .item-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    align-items: start;
+    align-items: flex-start;
 }
 
-@media (max-width: 900px) {
-    .item-grid {
-        grid-template-columns: 1fr;
-    }
+.item-grid > .item-card {
+    flex: 1 1 480px;
+    min-width: 0;
 }
 
 .item-card {
@@ -91,6 +89,10 @@ legend {
 }
 
 .item-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     padding: 10px 12px;
     border-bottom: 1px solid #e3e5e8;
     background: #fafbfc;
@@ -164,6 +166,63 @@ legend {
     background: #f0f1f3;
 }
 
+.btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.btn:disabled:hover {
+    background: #fff;
+}
+
+/* Compact variant for the per-item header, which is uppercased+tracked. */
+.btn-copy {
+    flex-shrink: 0;
+    padding: 3px 9px;
+    font-size: 11px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.paste-panel {
+    margin-bottom: 16px;
+}
+
+.paste-box {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d6d8db;
+    border-radius: 8px;
+    background: #fff;
+    color: #21242c;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+}
+
+.paste-box:focus {
+    outline: 2px solid #1865f2;
+    outline-offset: -1px;
+}
+
+.paste-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.paste-hint {
+    font-size: 12px;
+    color: #9a9da3;
+}
+
 .btn-primary {
     background: #1865f2;
     border-color: #1865f2;
@@ -174,7 +233,7 @@ legend {
     background: #1a5cd8;
 }
 
-/* Item sidebar: fixed on wide screens, hidden where it would crowd the grid. */
+/* Item sidebar: always visible, fixed to the left edge. */
 .sidebar {
     position: fixed;
     left: 0;
@@ -222,17 +281,4 @@ legend {
 .sidebar-label {
     color: #9a9da3;
     font-weight: 400;
-}
-
-@media (min-width: 1100px) {
-    .app {
-        margin-left: 230px;
-        max-width: none;
-    }
-}
-
-@media (max-width: 1099px) {
-    .sidebar {
-        display: none;
-    }
 }

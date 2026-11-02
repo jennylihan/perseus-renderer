@@ -34,6 +34,18 @@ single object or an array of objects, and each object can be either shape:
 - **A full Perseus item** — `{ "question": {...}, "answerArea": {...}, "hints": [...] }`
 - **A bare renderer** — just the `question` part: `{ "content": "...", "widgets": {...}, "images": {} }`
   (it gets wrapped into an item automatically).
+- **A KA exercise export** — `{ "items": [{ "name": "...", "item_data": {...} }] }`;
+  each `name` is shown as the card's label.
+- **An exercise/problem-type export** — an array (or single object) of
+  `{ "problemType": "...", "assessmentItems": [{ "itemData": "..." }] }`, where
+  `itemData` is a JSON-encoded string (or an already-parsed object) of a full
+  Perseus item. Every assessment item becomes its own card, and the sidebar
+  groups cards under their `problemType` heading.
+
+You can also click **Paste JSON…** and paste any of those shapes directly
+(⌘/Ctrl+Enter renders). **Copy all JSON** and each card's **Copy JSON** copy the
+item JSON back out exactly as it was loaded. Each card has **Check answer** /
+**Reset** scoring and a **Show answer** toggle that reveals the solution.
 
 Every item in the file is rendered as its own interactive card in a two-column
 grid. Click **Load sample** (or just open the app) to load
