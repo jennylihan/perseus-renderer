@@ -137,19 +137,6 @@ legend {
     gap: 10px;
 }
 
-.score {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.score-ok {
-    color: #0a7b3e;
-}
-
-.score-bad {
-    color: #b3261e;
-}
-
 .btn {
     appearance: none;
     border: 1px solid #d6d8db;
@@ -281,4 +268,32 @@ legend {
 .sidebar-label {
     color: #9a9da3;
     font-weight: 400;
+}
+
+/* Hints: Perseus's "Hint #N" text is screen-reader-only and the visible
+   label is just a "1 / 2" counter, so add a visible numbered caption. */
+.framework-perseus {
+    counter-reset: hint;
+}
+
+.perseus-hint-renderer {
+    counter-increment: hint;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e3e5e8;
+}
+
+.perseus-hint-renderer::before {
+    content: "Hint " counter(hint);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5c6066;
+}
+
+.perseus-hint-renderer .perseus-hint-label {
+    display: none !important;
 }
